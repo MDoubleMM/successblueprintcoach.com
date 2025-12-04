@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const apiBase = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 export default function Register() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function Register() {
     setLoading(true);
     setError('');
 
-    const res = await fetch(`${basePath}/api/register`, {
+    const res = await fetch(`${apiBase}/api/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
