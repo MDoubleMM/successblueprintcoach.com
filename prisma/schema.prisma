@@ -1,0 +1,94 @@
+// Prisma schema for Success Blueprint Coach
+// Run `npx prisma migrate dev` to apply migrations locally.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  goals   Goal[]
+  habits  Habit[]
+  tasks   Task[]
+  states  DailyState[]
+  checkins Checkin[]
+}
+
+model Goal {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  type        String
+  createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  habits Habit[]
+}
+
+model Habit {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  goalId      Int?
+  title       String
+  description String?
+  frequency   String
+  targetTime  String?
+  createdAt   DateTime @default(now())
+
+  user   User @relation(fields: [userId], references: [id])
+  goal   Goal? @relation(fields: [goalId], references: [id])
+  checkins Checkin[]
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String   @default("todo")
+  createdAt   DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  checkins Checkin[]
+}
+
+model DailyState {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  date       DateTime
+  mood       Int
+  energy     Int
+  stress     Int
+  sleepHours Float
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model Checkin {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  habitId   Int?
+  taskId    Int?
+  date      DateTime
+  status    String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  habit Habit? @relation(fields: [habitId], references: [id])
+  task  Task?  @relation(fields: [taskId], references: [id])
+}
